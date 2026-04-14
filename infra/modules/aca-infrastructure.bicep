@@ -61,6 +61,7 @@ var baseArgs = [
 ]
 var namespaceArgs = [for ns in namespaces: ['--namespace', ns]]
 var serverArgs = flatten(concat([baseArgs], namespaceArgs))
+var privateEndpointName = '${environmentName}-pe'
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: environmentName
@@ -86,7 +87,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
     configuration: {
       activeRevisionsMode: 'Single'
       ingress: {
-        external: true
+        external: false
         targetPort: 8080
         // SECURITY NOTE: allowInsecure is set to false to enforce HTTPS-only external access.
         // Never set this to true as that will allow plain HTTP traffic, exposing sensitive data such as access tokens to interception.
@@ -195,6 +196,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
 }
 
 // Private Endpoint targeting the managed environment
+
 resource acaEnvironmentPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
   name: privateEndpointName
   location: location
@@ -211,7 +213,7 @@ resource acaEnvironmentPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-
           // Group ID for Container Apps managed environments Private Link.
           // If deployment errors with an invalid groupId, we can adjust based on the RP response.
           groupIds: [
-            'managedEnvironments'
+            'managedEnvironment'
           ]
           requestMessage: 'Private endpoint for Container Apps managed environment'
         }
