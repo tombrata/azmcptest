@@ -38,6 +38,12 @@ param azureAdClientId string
 @minLength(1)
 param namespaces array
 
+@description('Subnet resource ID used to VNet-integrate the Container Apps managed environment (infrastructure subnet).')
+param environmentInfrastructureSubnetId string
+
+@description('Subnet resource ID where the Private Endpoint for the Container Apps managed environment should be created.')
+param privateEndpointSubnetId string
+
 var baseArgs = [
   '--transport'
   'http'
@@ -60,6 +66,9 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
   name: environmentName
   location: location
   properties: {
+    vnetConfiguration: {
+      infrastructureSubnetId: environmentInfrastructureSubnetId
+    }
   }
 }
 
@@ -183,6 +192,35 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
     }
   }
+}
+
+// Private Endpoint targeting the managed environment
+resource acaEnvironmentPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
+  name: privateEndpointName
+  location: location
+  properties: {
+    subnet: {
+      id: privateEndpointSubnetId
+    }
+    customNetworkInterfaceName: '${privateEndpointName}-nic'
+    privateLinkServiceConnections: [
+      {
+        name: '${privateEndpointName}-pls'
+        properties: {
+          privateLinkServiceId: containerAppsEnvironment.id
+          // Group ID for Container Apps managed environments Private Link.
+          // If deployment errors with an invalid groupId, we can adjust based on the RP response.
+          groupIds: [
+            'managedEnvironments'
+          ]
+          requestMessage: 'Private endpoint for Container Apps managed environment'
+        }
+      }
+    ]
+  }
+  dependsOn: [
+    containerAppsEnvironment
+  ]
 }
 
 output containerAppResourceId string = containerApp.id
