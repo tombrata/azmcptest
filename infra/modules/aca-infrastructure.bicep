@@ -31,6 +31,9 @@ param azureMcpCollectTelemetry string
 @description('Azure AD Tenant ID')
 param azureAdTenantId string
 
+@description('Subnet ID')
+param infrastructureSubnetId string
+
 @description('Azure AD Client ID')
 param azureAdClientId string
 
@@ -60,7 +63,10 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
   name: environmentName
   location: location
   properties: {
-  }
+    vnetConfiguration: {
+      infrastructureSubnetId: infrastructureSubnetId
+    }
+}
 }
 
 resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
