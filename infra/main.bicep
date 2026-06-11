@@ -58,16 +58,16 @@ module appInsights 'modules/application-insights.bicep' = {
 }
 
 // Deploy Entra App
-var entraAppUniqueName = '${replace(toLower(entraAppDisplayName), ' ', '-')}-${uniqueString(resourceGroup().id)}'
+//var entraAppUniqueName = '${replace(toLower(entraAppDisplayName), ' ', '-')}-${uniqueString(resourceGroup().id)}'
 //
-module entraApp 'modules/entra-app.bicep' = {
-  name: 'entra-app-deployment'
-  params: {
-    entraAppDisplayName: entraAppDisplayName
-    entraAppUniqueName: entraAppUniqueName
-    serviceManagementReference: serviceManagementReference
-  }
-}
+//module entraApp 'modules/entra-app.bicep' = {
+//  name: 'entra-app-deployment'
+//  params: {
+//    entraAppDisplayName: entraAppDisplayName
+//    entraAppUniqueName: entraAppUniqueName
+//    serviceManagementReference: serviceManagementReference
+//  }
+//}
 
 // Deploy ACA Infrastructure to host Azure MCP Server
 module acaInfrastructure 'modules/aca-infrastructure.bicep' = {
