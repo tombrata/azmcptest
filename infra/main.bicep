@@ -79,6 +79,7 @@ module acaInfrastructure 'modules/aca-infrastructure.bicep' = {
     azureMcpCollectTelemetry: string(!empty(appInsights.outputs.connectionString))
     azureAdTenantId: tenant().tenantId
     azureAdClientId: entraApp.outputs.entraAppClientId
+    infrastructureSubnetId: '/subscriptions/a3802da5-4862-4f67-8e79-a3a493415113/resourceGroups/rg-ess-ess-aifoundry-eastus-spokenet-dev/providers/Microsoft.Network/virtualNetworks/vnet-ess-ess-aifoundry-eastus-dev/subnets/container_app_subnet'
     namespaces: ['storage', 'advisor', 'compute', 'monitor']
   }
 }
